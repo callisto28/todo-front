@@ -1,56 +1,100 @@
 import {
   View,
   Text,
-  FlatList,
-  ActivityIndicator,
-  ListRenderItem,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Button,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import axios from "axios";
-
-import TodoList from "../../components/TodoList";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import userService from "../../api/services/user.service";
+import { Card, CheckBox } from "react-native-elements";
+import { AntDesign } from "@expo/vector-icons";
+import CustomLogo from "../../components/CustomLogo";
 
 const TodoListScreen = ({ navigation }: any) => {
-  const [token, setToken] = useState<string>("");
-  const userToken = localStorage.getItem("token");
+  const [completed, setCompleted] = useState<boolean>(false);
+  const [token, setToken] = useState<string | any>("");
   const [todos, setTodos] = useState<any>([]);
 
   const config = {
     headers: {
-      Authorization: "Bearer " + userToken,
+      Authorization: `Bearer ${token}`,
     },
   };
 
+  const getToken = async () => {
+    const tokens = await AsyncStorage.getItem("access_token");
+    setToken(tokens);
+  };
   useEffect(() => {
-    axios.get(`http://localhost:3022/todo`, config).then((res) => {
-      console.log(res.data, "res");
-      setTodos(res.data);
-    });
+    getToken();
   }, []);
 
-  const renderItem: ListRenderItem<any> = ({ item }) => {
-    return <TodoList todos={item} />;
+  const getData = async () => {
+    const data = await userService.getTodo(config);
+
+    setTodos(data.data);
   };
+
+  useEffect(() => {
+    if (token) {
+      getData();
+    }
+  }, [token]);
+
+  const delData = async (id: any) => {
+    await userService.delTodo(id, config);
+  };
+
   const onTodoList = () => {
     navigation.navigate("TodoScreen");
   };
 
   return (
-    <View style={styles.container}>
-      <FlatList
-        data={todos}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
-      />
-
-      <TouchableOpacity onPress={onTodoList} style={{ alignItems: "center" }}>
-        <Text>Créer une nouvelle tâche</Text>
-      </TouchableOpacity>
-    </View>
+    <ScrollView>
+      <View style={styles.container}>
+        <View style={styles.logo}>
+          <CustomLogo />
+        </View>
+        <TouchableOpacity onPress={onTodoList} style={{ alignItems: "center" }}>
+          <Text style={{ color: "red" }}>Créer une nouvelle tâche</Text>
+        </TouchableOpacity>
+        {todos.map((item: any, key: any) => (
+          <Card key={key}>
+            <Text
+              style={{
+                fontWeight: "bold",
+                textAlign: "center",
+                color: "black",
+              }}
+            >
+              Titre :{item.title}
+            </Text>
+            <Text style={{ color: "gray", textAlign: "center" }}>
+              Description :{item.description}
+            </Text>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <View>
+                <CheckBox
+                  style={{ alignSelf: "center", backgroundColor: "#202125" }}
+                  center
+                  checked={completed}
+                  title="Completed"
+                  onPress={() => setCompleted(!completed)}
+                />
+              </View>
+              <AntDesign
+                name="delete"
+                size={20}
+                color="red"
+                onPress={() => delData(item.id)}
+              />
+            </View>
+          </Card>
+        ))}
+      </View>
+    </ScrollView>
   );
 };
 
@@ -58,33 +102,17 @@ export default TodoListScreen;
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#202125",
+    backgroundColor: "black",
+  },
+  logo: {
+    top: "3%",
+    width: "50%",
+    maxWidth: 300,
+    maxHeight: 200,
+    borderRadius: 70,
+    marginBottom: 40,
   },
 });
-
-// return (
-//   <View>
-//     <Text
-//       style={{ fontWeight: "bold", justifyContent: "center", fontSize: 22 }}
-//     >
-//       Tâches à effectuer
-//     </Text>
-
-//     <View style={{ flexGrow: 2, padding: 1 }}>
-//       <View style={styles.container}>
-//         {todos.length > 0 ? (
-//           <FlatList
-//             data={todos}
-//             renderItem={renderItem}
-//             keyExtractor={(item) => item.id.toString()}
-//           />
-//         ) : (
-//           <ActivityIndicator size="large" />
-//         )}
-//       </View>
-//     </View>
-//     <CustomButton text="Créer une nouvelle" onPress={onTodoList} />
-//   </View>
-// );

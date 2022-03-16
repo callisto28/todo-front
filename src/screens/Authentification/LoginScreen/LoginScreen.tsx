@@ -1,6 +1,6 @@
 import axios from "axios";
-import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useEffect, useState } from "react";
+
 import { Controller, useForm } from "react-hook-form";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import CustomButton from "../../../components/CustomButton";
@@ -9,9 +9,9 @@ import CustomLogo from "../../../components/CustomLogo";
 import CustomTextInput from "../../../components/CustomTextInput";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import AuthUsers from "../../../api/services/AuthUser";
+
 import userService from "../../../api/services/user.service";
-import AsyncStorage from "@react-native-community/async-storage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type FormValues = {
   username: string;
@@ -33,19 +33,13 @@ const Login = ({ navigation }: any) => {
     const params = { username, password };
     try {
       const data: any = await userService.login(params);
-      console.log(data, "data");
-      const token = data.data.access_token;
-      AsyncStorage.setItem("token", token);
-      setToken(data.data.access_token);
-      console.log(
-        // data.data.access_token,
-        // "token",
-        AsyncStorage.setItem,
-        "AsyncStorage"
-      );
+
+      await AsyncStorage.setItem("access_token", data.data.access_token);
+
       navigation.navigate("TodoScreen");
     } catch (error) {
       alert("Invalid username or password");
+      console.log(error);
       setIsLoading(false);
     }
   };
@@ -108,8 +102,9 @@ const Login = ({ navigation }: any) => {
         {errors && (
           <Text style={styles.error}>Veuillez remplir tous les champs</Text>
         )}
-        <CustomButton text="Login" onPress={onSignInPress} />
-
+        <View>
+          <CustomButton text="Login" onPress={onSignInPress} />
+        </View>
         <View
           style={{
             flexDirection: "row",
@@ -137,9 +132,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#202125",
-    // padding: 20,
-    // top: "25%",
+    backgroundColor: "black",
   },
 
   link: {

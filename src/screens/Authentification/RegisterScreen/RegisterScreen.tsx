@@ -18,6 +18,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { Controller, useForm } from "react-hook-form";
 import AuthUsers from "../../../api/services/AuthUser";
 import { ILogin } from "../../../types/types";
+import userService from "../../../api/services/user.service";
 
 type FormValues = {
   username: string;
@@ -42,7 +43,7 @@ const Register = ({ navigation }: any) => {
     setIsLoading(true);
     const params = { username, password, firstname, lastname };
     try {
-      const data = AuthUsers.signup(params);
+      const data = userService.signup(params);
 
       // if (response.status === 201) {
       alert("Inscription success");
@@ -117,7 +118,10 @@ const Register = ({ navigation }: any) => {
           secureTextEntry={false}
           onChangeText={(lastname) => setLastname(lastname)}
         />
-        <CustomButton text="Register" onPress={onSignInPress} />
+        <View>
+          <CustomButton text="Register" onPress={onSignInPress} />
+        </View>
+
         <View
           style={{
             flexDirection: "row",

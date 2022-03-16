@@ -18,6 +18,7 @@ export const Home = ({ navigation }: any) => {
   const onSignUp = () => {
     navigation.navigate("Register");
   };
+
   return (
     <View style={styles.container}>
       <View style={styles.logo}>
@@ -38,7 +39,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#202125",
+    backgroundColor: "black",
   },
   logo: {
     width: "50%",

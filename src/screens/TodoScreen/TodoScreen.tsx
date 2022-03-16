@@ -1,18 +1,27 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { CheckBox } from "react-native-elements";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CustomInput from "../../components/CustomInput";
 import CustomButton from "../../components/CustomButton";
 import CustomLogo from "../../components/CustomLogo";
-import axios from "axios";
 import userService from "../../api/services/user.service";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const TodoScreen = ({ navigation }: any) => {
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [completed, setCompleted] = useState<boolean>(false);
-  const [token, setToken] = useState<string>("");
+  const [token, setToken] = useState<any>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const getToken = async () => {
+    const token = await AsyncStorage.getItem("access_token");
+    setToken(token);
+  };
+
+  useEffect(() => {
+    getToken();
+  }, []);
 
   const onSignInPress = async () => {
     if (!title.trim() || !description.trim()) {
@@ -20,32 +29,19 @@ const TodoScreen = ({ navigation }: any) => {
       return;
     }
     setIsLoading(true);
-    const params = { title, description, completed };
 
-    const userToken = localStorage.getItem("token");
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    const params = { title, description, completed, config };
     try {
-      // const response = await axios.post(
-      //   `http://localhost:3022/todo/create`,
-      //   {
-      //     title,
-      //     description,
-      //     completed,
-      //   },
-      //   { headers: { Authorization: `Bearer ${userToken}` } }
-      // );
-      // console.log(response.data, "response");
-
-      const data = await userService.postTodo(params);
-
-      // if (response.status === 201) {
-      //   alert("Create success");
-
+      await userService.postTodo(params);
       navigation.navigate("TodoListScreen");
-      // } else {
-      //   alert("Invalid title or description1");
-      // }
     } catch (error) {
-      alert("Invalid title or description2");
+      alert("Invalid title or description");
       setIsLoading(false);
     }
   };
@@ -56,9 +52,8 @@ const TodoScreen = ({ navigation }: any) => {
   return (
     <View style={styles.container}>
       <View>
-        <View style={styles.logo}>
-          <CustomLogo />
-        </View>
+        <CustomLogo />
+
         <CustomInput
           titleText="title :"
           placeholder="your title"
@@ -82,8 +77,10 @@ const TodoScreen = ({ navigation }: any) => {
           checked={completed}
           onPress={() => setCompleted(!completed)}
         />
-        <CustomButton text="Valider" onPress={onSignInPress} />
-        <CustomButton text="Voir vos Todolists" onPress={onTodoList} />
+        <View>
+          <CustomButton text="Valider votre tâche" onPress={onSignInPress} />
+          <CustomButton text="Voir vos Tâches" onPress={onTodoList} />
+        </View>
       </View>
     </View>
   );
