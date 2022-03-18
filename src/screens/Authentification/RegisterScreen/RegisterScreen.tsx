@@ -1,14 +1,8 @@
 import axios from "axios";
-import React, { useContext, useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  TouchableOpacity,
-  Button,
-} from "react-native";
-
+import React, { useState } from "react";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import CustomButton from "../../../components/CustomButton";
 import CustomInput from "../../../components/CustomInput";
 import CustomLogo from "../../../components/CustomLogo";
@@ -16,9 +10,10 @@ import CustomLogo from "../../../components/CustomLogo";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Controller, useForm } from "react-hook-form";
-import AuthUsers from "../../../api/services/AuthUser";
-import { ILogin } from "../../../types/types";
-import userService from "../../../api/services/user.service";
+
+// import userService from "../../../api/services/user.service";
+import { RouteParams } from "../../../types/types";
+import { todoService } from "../../../api/services/todo.service";
 
 type FormValues = {
   username: string;
@@ -27,7 +22,8 @@ type FormValues = {
   firstname: string;
 };
 
-const Register = ({ navigation }: any) => {
+const Register = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<RouteParams>>();
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [firstname, setFirstname] = useState<string>("");
@@ -35,29 +31,21 @@ const Register = ({ navigation }: any) => {
   const [token, setToken] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const onSignInPress = async () => {
-    if (!username.trim() || !password.trim()) {
-      alert("Please enter username, password, firstname and lastname");
-      return;
-    }
+  const [postSignup, {}] = todoService.usePostSignupMutation();
+
+  const handleCreateAccount = async () => {
     setIsLoading(true);
-    const params = { username, password, firstname, lastname };
-    try {
-      const data = userService.signup(params);
 
-      // if (response.status === 201) {
-      alert("Inscription success");
-      // setToken(data.access_token);
-      // console.log(data.access_token, "token");
+    await postSignup({
+      body: {
+        username,
+        password,
+        firstname,
+        lastname,
+      },
+    });
 
-      navigation.navigate("Login");
-      // } else {
-      //   alert("Invalid username or password");
-      // }
-    } catch (error) {
-      alert("Invalid username or password");
-      setIsLoading(false);
-    }
+    navigation.navigate("Login" as any);
   };
 
   const validationSchema = Yup.object({
@@ -79,47 +67,54 @@ const Register = ({ navigation }: any) => {
 
   return (
     <View style={styles.container}>
-      <View>
+      <View style={styles.logo}>
         <CustomLogo />
-        <View />
-
-        <CustomInput
-          titleText="Pseudonyme :"
-          placeholder="username"
-          value={username}
-          setValue={setUsername}
-          secureTextEntry={false}
-          onChangeText={(username) => setUsername(username)}
-        />
-
-        <CustomInput
-          titleText="Mot de passe : "
-          placeholder="password"
-          value={password}
-          setValue={setPassword}
-          secureTextEntry={true}
-          onChangeText={(password) => setPassword(password)}
-        />
-
-        <CustomInput
-          titleText="Nom :"
-          placeholder="firstname"
-          value={firstname}
-          setValue={setFirstname}
-          secureTextEntry={false}
-          onChangeText={(firstname) => setFirstname(firstname)}
-        />
-
-        <CustomInput
-          titleText="Prénom :"
-          placeholder="lastname"
-          value={lastname}
-          setValue={setLastname}
-          secureTextEntry={false}
-          onChangeText={(lastname) => setLastname(lastname)}
-        />
+      </View>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          width: "70%",
+          alignSelf: "center",
+        }}
+      >
         <View>
-          <CustomButton text="Register" onPress={onSignInPress} />
+          <CustomInput
+            label="Username"
+            value={username}
+            secureTextEntry={false}
+            type="text"
+            setValue={setUsername}
+            onChangeText={(value) => setUsername(value)}
+          />
+
+          <CustomInput
+            value={password}
+            label="password"
+            type="password"
+            secureTextEntry={true}
+            setValue={setPassword}
+            onChangeText={(value) => setPassword(value)}
+          />
+
+          <CustomInput
+            value={firstname}
+            label="firstname"
+            secureTextEntry={false}
+            setValue={setFirstname}
+            onChangeText={(value) => setFirstname(value)}
+          />
+
+          <CustomInput
+            value={lastname}
+            label="lastname"
+            secureTextEntry={false}
+            setValue={setLastname}
+            onChangeText={(value) => setLastname(value)}
+          />
+        </View>
+        <View>
+          <CustomButton text="Register" onPress={handleCreateAccount} />
         </View>
 
         <View
@@ -134,7 +129,7 @@ const Register = ({ navigation }: any) => {
           </Text>
           <TouchableOpacity
             activeOpacity={0.8}
-            onPress={() => navigation.navigate("Login")}
+            onPress={() => navigation.navigate("Login" as any)}
           >
             <Text style={styles.link}> Login</Text>
           </TouchableOpacity>
@@ -147,9 +142,16 @@ const Register = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
+    alignSelf: "stretch",
+    justifyContent: "space-around",
     backgroundColor: "black",
+  },
+  logo: {
+    maxWidth: 250,
+    maxHeight: 150,
+    marginHorizontal: "25%",
+    borderRadius: 50,
+    marginBottom: 40,
   },
 
   link: {

@@ -51,24 +51,33 @@ const TodoScreen = ({ navigation }: any) => {
 
   return (
     <View style={styles.container}>
-      <View>
+      <View style={styles.logo}>
         <CustomLogo />
+      </View>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          width: "70%",
+          alignSelf: "center",
+        }}
+      >
+        <CustomInput
+          label="Title"
+          value={title}
+          secureTextEntry={false}
+          type="text"
+          setValue={setTitle}
+          onChangeText={(value) => setTitle(value)}
+        />
 
         <CustomInput
-          titleText="title :"
-          placeholder="your title"
-          value={title}
-          setValue={setTitle}
-          secureTextEntry={false}
-          onChangeText={(title) => setTitle(title)}
-        />
-        <CustomInput
-          titleText="description :"
-          placeholder="your description"
+          label="Description"
           value={description}
-          setValue={setDescription}
           secureTextEntry={false}
-          onChangeText={(description) => setTitle(description)}
+          type="text"
+          setValue={setDescription}
+          onChangeText={(value) => setDescription(value)}
         />
         <CheckBox
           style={styles.checkbox}
@@ -77,10 +86,10 @@ const TodoScreen = ({ navigation }: any) => {
           checked={completed}
           onPress={() => setCompleted(!completed)}
         />
-        <View>
-          <CustomButton text="Valider votre tâche" onPress={onSignInPress} />
-          <CustomButton text="Voir vos Tâches" onPress={onTodoList} />
-        </View>
+      </View>
+      <View>
+        <CustomButton text="Valider votre tâche" onPress={onSignInPress} />
+        <CustomButton text="Voir vos Tâches" onPress={onTodoList} />
       </View>
     </View>
   );
@@ -91,15 +100,19 @@ export default TodoScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#202125",
+    alignSelf: "stretch",
+    justifyContent: "space-around",
+    backgroundColor: "black",
   },
   checkbox: {
     alignSelf: "center",
     backgroundColor: "#202125",
   },
   logo: {
-    width: "100%",
+    maxWidth: 250,
+    maxHeight: 150,
+    marginHorizontal: "25%",
+    borderRadius: 50,
+    marginBottom: 40,
   },
 });

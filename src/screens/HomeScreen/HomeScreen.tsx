@@ -1,22 +1,19 @@
 import React, { useState } from "react";
-import {
-  ActivityIndicator,
-  View,
-  Text,
-  TouchableOpacity,
-  Button,
-  StyleSheet,
-  Alert,
-} from "react-native";
-import CustomButton from "../../../components/CustomButton";
-import CustomLogo from "../../../components/CustomLogo";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { View, StyleSheet } from "react-native";
+import CustomButton from "../../components/CustomButton";
+import CustomLogo from "../../components/CustomLogo";
+import { RouteParams } from "../../types/types";
 
-export const Home = ({ navigation }: any) => {
+export const Home = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<RouteParams>>();
+
   const onSignIn = () => {
-    navigation.navigate("Login");
+    navigation.navigate("Login" as any);
   };
   const onSignUp = () => {
-    navigation.navigate("Register");
+    navigation.navigate("Register" as any);
   };
 
   return (
@@ -28,7 +25,10 @@ export const Home = ({ navigation }: any) => {
         <CustomButton text="Se connecter" onPress={onSignIn} />
       </View>
       <View style={styles.button}>
-        <CustomButton text="Créer un compte" onPress={onSignUp} />
+        <CustomButton
+          text="Créer un compte"
+          onPress={() => navigation.navigate("Register" as any)}
+        />
       </View>
     </View>
   );

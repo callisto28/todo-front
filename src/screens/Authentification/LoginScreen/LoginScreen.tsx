@@ -1,6 +1,4 @@
-import axios from "axios";
-import React, { useEffect, useState } from "react";
-
+import React, { useState, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import CustomButton from "../../../components/CustomButton";
@@ -9,9 +7,10 @@ import CustomLogo from "../../../components/CustomLogo";
 import CustomTextInput from "../../../components/CustomTextInput";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-
-import userService from "../../../api/services/user.service";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  setLoginCredentials,
+  usePostLoginMutation,
+} from "../../../api/services/todo.service";
 
 type FormValues = {
   username: string;
@@ -21,27 +20,20 @@ type FormValues = {
 const Login = ({ navigation }: any) => {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [token, setToken] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [errorMsg, setErrorMsg] = useState<string>("");
 
-  const onSignInPress = async () => {
-    if (!username.trim() || !password.trim()) {
-      alert("Please enter username and password");
-      return;
-    }
-    setIsLoading(true);
-    const params = { username, password };
-    try {
-      const data: any = await userService.login(params);
+  const [postLogin] = usePostLoginMutation();
 
-      await AsyncStorage.setItem("access_token", data.data.access_token);
-
-      navigation.navigate("TodoScreen");
-    } catch (error) {
-      alert("Invalid username or password");
-      console.log(error);
-      setIsLoading(false);
-    }
+  const onSubmit = ({ username, password }: FormValues) => {
+    postLogin({ username, password })
+      .unwrap()
+      .then((credential: { username: string; password: string }) =>
+        dispatchEvent(setLoginCredentials(credential))
+      )
+      .catch((error) => {
+        setErrorMsg(error.message);
+      });
+    navigation.navigate("TodoScreen" as any);
   };
 
   const validationSchema = Yup.object({
@@ -67,43 +59,51 @@ const Login = ({ navigation }: any) => {
 
   return (
     <View style={styles.container}>
-      <View>
+      <View style={styles.logo}>
         <CustomLogo />
-        <Controller
+      </View>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          width: "70%",
+          alignSelf: "center",
+        }}
+      >
+        {/* <Controller
           control={control}
           name="username"
-          render={({ field: { onChange, value }, fieldState: { error } }) => (
-            <CustomInput
-              titleText="Pseudonym :"
-              value={value}
-              placeholder="username"
-              setValue={setUsername}
-              secureTextEntry={false}
-              onChangeText={onChange}
-              error={error}
-            />
-          )}
+          render={({ field: { onChange, value }, fieldState: { error } }) => ( */}
+        <CustomInput
+          label="Username"
+          value={username}
+          secureTextEntry={false}
+          type="text"
+          setValue={setUsername}
+          onChangeText={(value) => setUsername(value)}
         />
-        <Controller
+        {/* )}
+        /> */}
+        {/* <Controller
           control={control}
           name="password"
-          render={({ field: { onChange, value }, fieldState: { error } }) => (
-            <CustomInput
-              titleText="Mot de passe : "
-              placeholder="password"
-              value={value}
-              setValue={setPassword}
-              secureTextEntry={true}
-              onChangeText={onChange}
-              error={error}
-            />
-          )}
+          render={({ field: { onChange, value }, fieldState: { error } }) => ( */}
+        <CustomInput
+          value={password}
+          label="password"
+          type="password"
+          secureTextEntry={true}
+          setValue={setPassword}
+          onChangeText={(value) => setPassword(value)}
         />
+        {/* )}
+        /> */}
         {errors && (
           <Text style={styles.error}>Veuillez remplir tous les champs</Text>
         )}
         <View>
-          <CustomButton text="Login" onPress={onSignInPress} />
+          <CustomButton text="Login" onPress={onSubmit} />
+          {/* navigation.navigate("TodoScreen" as any); */}
         </View>
         <View
           style={{
@@ -130,9 +130,16 @@ const Login = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
+    alignSelf: "stretch",
+    justifyContent: "space-around",
     backgroundColor: "black",
+  },
+  logo: {
+    maxWidth: 250,
+    maxHeight: 150,
+    marginHorizontal: "25%",
+    borderRadius: 50,
+    marginBottom: 40,
   },
 
   link: {

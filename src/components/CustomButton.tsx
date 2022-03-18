@@ -1,11 +1,12 @@
-import { Text, StyleSheet, Pressable } from "react-native";
+import { Text, StyleSheet } from "react-native";
+import { Button } from "react-native-paper";
 import React from "react";
 
 const CustomButton = ({ onPress, text }: any) => {
   return (
-    <Pressable onPress={onPress} style={styles.container}>
+    <Button mode="contained" onPress={onPress} style={styles.container}>
       <Text style={styles.text}>{text.toUpperCase()}</Text>
-    </Pressable>
+    </Button>
   );
 };
 
@@ -15,9 +16,9 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: "#3B71F3",
     width: "100%",
-    padding: 10,
+    padding: 2,
     marginVertical: 5,
-    borderRadius: 30,
+    borderRadius: 10,
     alignItems: "center",
   },
   text: {
