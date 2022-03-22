@@ -27,3 +27,19 @@ export type RouteParams = {
     }
 
 }
+
+// export type Todo = {
+//     id: number,
+//     title: string,
+//     description: string,
+//     completed: boolean
+// }
+
+export type User = {
+
+    username: string,
+    lastname: string,
+    firstname: string,
+    password: string
+
+}

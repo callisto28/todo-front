@@ -7,10 +7,9 @@ import CustomLogo from "../../../components/CustomLogo";
 import CustomTextInput from "../../../components/CustomTextInput";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import {
-  setLoginCredentials,
-  usePostLoginMutation,
-} from "../../../api/services/todo.service";
+import { usePostLoginMutation } from "../../../api/services/todo.service";
+import { useDispatch } from "react-redux";
+import { setUser } from "../../../api/store/reducers/user.reducer";
 
 type FormValues = {
   username: string;
@@ -20,21 +19,31 @@ type FormValues = {
 const Login = ({ navigation }: any) => {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [errorMsg, setErrorMsg] = useState<string>("");
 
-  const [postLogin] = usePostLoginMutation();
+  const [postLogin, { isLoading, data, isSuccess }] = usePostLoginMutation();
+  console.log(isSuccess, "isSuccess");
 
-  const onSubmit = ({ username, password }: FormValues) => {
-    postLogin({ username, password })
-      .unwrap()
-      .then((credential: { username: string; password: string }) =>
-        dispatchEvent(setLoginCredentials(credential))
-      )
-      .catch((error) => {
-        setErrorMsg(error.message);
-      });
-    navigation.navigate("TodoScreen" as any);
+  const dispatch = useDispatch();
+
+  const onSubmit = (user: {
+    username: string;
+    password: string;
+    access_token: string;
+  }) => {
+    postLogin({ username, password });
+
+    navigation.navigate("TodoListScreen" as any);
   };
+
+  useEffect(() => {
+    if (data?.access_token) {
+      dispatch(
+        setUser({
+          access_token: data.access_token,
+        })
+      );
+    }
+  }, [data]);
 
   const validationSchema = Yup.object({
     username: Yup.string().required("Username is required"),
@@ -79,6 +88,9 @@ const Login = ({ navigation }: any) => {
           value={username}
           secureTextEntry={false}
           type="text"
+          onFocus={() => {
+            setUsername("");
+          }}
           setValue={setUsername}
           onChangeText={(value) => setUsername(value)}
         />
@@ -92,6 +104,9 @@ const Login = ({ navigation }: any) => {
           value={password}
           label="password"
           type="password"
+          onFocus={() => {
+            setPassword("");
+          }}
           secureTextEntry={true}
           setValue={setPassword}
           onChangeText={(value) => setPassword(value)}

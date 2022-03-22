@@ -1,19 +1,24 @@
 import axios from "axios";
 import React, { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import {
+  NativeStackNavigationProp,
+  NativeStackScreenProps,
+} from "@react-navigation/native-stack";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import CustomButton from "../../../components/CustomButton";
 import CustomInput from "../../../components/CustomInput";
 import CustomLogo from "../../../components/CustomLogo";
-
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Controller, useForm } from "react-hook-form";
-
-// import userService from "../../../api/services/user.service";
 import { RouteParams } from "../../../types/types";
-import { todoService } from "../../../api/services/todo.service";
+
+import { useDispatch } from "react-redux";
+import { setUser } from "../../../api/store/reducers/user.reducer";
+import { usePostSignupMutation } from "../../../api/services/todo.service";
+
+export type SignupProps = NativeStackScreenProps<RouteParams, "Register">;
 
 type FormValues = {
   username: string;
@@ -22,31 +27,32 @@ type FormValues = {
   firstname: string;
 };
 
-const Register = () => {
-  const navigation = useNavigation<NativeStackNavigationProp<RouteParams>>();
+const Register = (props: SignupProps) => {
+  const navigation = useNavigation();
+  const [postSignup, { isLoading, data }] = usePostSignupMutation();
+  const dispatch = useDispatch();
+
+  const onSubmit = async (todoService: {
+    username: string;
+    password: string;
+    firstname: string;
+    lastname: string;
+  }) => {
+    dispatch(
+      setUser({
+        username: todoService.username,
+        firstname: todoService.firstname,
+        lastname: todoService.lastname,
+      })
+    );
+    await postSignup({ username, password, firstname, lastname });
+    navigation.navigate("Login" as any);
+  };
+
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [firstname, setFirstname] = useState<string>("");
   const [lastname, setLastname] = useState<string>("");
-  const [token, setToken] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  const [postSignup, {}] = todoService.usePostSignupMutation();
-
-  const handleCreateAccount = async () => {
-    setIsLoading(true);
-
-    await postSignup({
-      body: {
-        username,
-        password,
-        firstname,
-        lastname,
-      },
-    });
-
-    navigation.navigate("Login" as any);
-  };
 
   const validationSchema = Yup.object({
     username: Yup.string().required("Username is required"),
@@ -80,7 +86,7 @@ const Register = () => {
       >
         <View>
           <CustomInput
-            label="Username"
+            label="Pseudonyme"
             value={username}
             secureTextEntry={false}
             type="text"
@@ -89,8 +95,8 @@ const Register = () => {
           />
 
           <CustomInput
+            label="Mot de passe"
             value={password}
-            label="password"
             type="password"
             secureTextEntry={true}
             setValue={setPassword}
@@ -98,23 +104,28 @@ const Register = () => {
           />
 
           <CustomInput
+            label="Prénom"
             value={firstname}
-            label="firstname"
             secureTextEntry={false}
             setValue={setFirstname}
             onChangeText={(value) => setFirstname(value)}
           />
 
           <CustomInput
+            label="Nom"
             value={lastname}
-            label="lastname"
             secureTextEntry={false}
             setValue={setLastname}
             onChangeText={(value) => setLastname(value)}
           />
         </View>
         <View>
-          <CustomButton text="Register" onPress={handleCreateAccount} />
+          <CustomButton
+            text="S'inscrire"
+            onPress={() =>
+              onSubmit({ username, password, firstname, lastname })
+            }
+          />
         </View>
 
         <View

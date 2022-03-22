@@ -25,10 +25,7 @@ export const Home = () => {
         <CustomButton text="Se connecter" onPress={onSignIn} />
       </View>
       <View style={styles.button}>
-        <CustomButton
-          text="Créer un compte"
-          onPress={() => navigation.navigate("Register" as any)}
-        />
+        <CustomButton text="Créer un compte" onPress={onSignUp} />
       </View>
     </View>
   );

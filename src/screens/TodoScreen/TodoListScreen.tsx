@@ -1,165 +1,98 @@
-import { View, Text, StyleSheet } from "react-native";
-import React from "react";
-import { useGetTodoQuery } from "../../api/services/todo.service";
-import { Card, Paragraph } from "react-native-paper";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+  ScrollView,
+  SafeAreaView,
+  TouchableOpacity,
+} from "react-native";
+import React, { useState } from "react";
+import {
+  useDelTodoMutation,
+  useGetTodoQuery,
+} from "../../api/services/todo.service";
+import { CheckBox } from "react-native-elements";
+import { AntDesign } from "@expo/vector-icons";
+import { useDispatch, useSelector } from "react-redux";
 
-const TodoListScreen = () => {
-  const { isLoading, error, data = { todos: [] } } = useGetTodoQuery("");
-  console.log(data.todos, "data GetTodo");
+const TodoListScreen = ({ navigation }: any) => {
+  const [completed, setCompleted] = useState<boolean>(false);
+  const [delTodo, { isLoading: isDeleting }] = useDelTodoMutation();
+  const { isLoading, error, data } = useGetTodoQuery("");
 
-  if (error) {
-    return (
-      <View style={styles.container}>
-        <Paragraph>Aucune Tâche trouvée</Paragraph>
-      </View>
-    );
-  }
-  const renderTodo = ({ title = "", description = "" }) => (
-    <Card style={styles.card} mode="elevated">
-      <Card.Title title={title} />
-      <Card.Content>
-        <View style={styles.content}>
-          <Paragraph>{description}</Paragraph>
+  console.log(isDeleting, "isDeleting");
+
+  const dispatch = useDispatch();
+  const DelData = (id: number) => {
+    console.log(id);
+    delTodo(id);
+  };
+  console.log(data, "data list");
+  return (
+    <ScrollView style={styles.container}>
+      {error ? (
+        <Text style={{ color: "red" }}>Aucune tâche</Text>
+      ) : isLoading ? (
+        <ActivityIndicator size="large" color="#0000ff" />
+      ) : data ? (
+        <View style={styles.container}>
+          <TouchableOpacity onPress={() => navigation.navigate("TodoScreen")}>
+            <Text style={{ color: "white", textAlign: "center" }}>
+              Créer une nouvelle tâche
+            </Text>
+          </TouchableOpacity>
+          {data?.map((todo: any, index: any) => (
+            <View key={index} style={styles.container}>
+              <Text style={styles.text}>{todo.title.toUpperCase()}</Text>
+              <Text style={styles.text}>{todo.description}</Text>
+              <View style={styles.checkbox}>
+                <CheckBox
+                  title="Completed"
+                  checked={todo.completed}
+                  onPress={() => setCompleted(!todo.completed)}
+                />
+
+                <AntDesign
+                  name="delete"
+                  size={24}
+                  color="red"
+                  onPress={() => DelData(todo.id)}
+                />
+              </View>
+            </View>
+          ))}
         </View>
-      </Card.Content>
-    </Card>
+      ) : (
+        isDeleting
+      )}
+    </ScrollView>
   );
-  return <View style={styles.container}>{data.todos.map(renderTodo)}</View>;
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignSelf: "stretch",
-    justifyContent: "space-around",
     backgroundColor: "black",
   },
+  text: {
+    color: "white",
+    textAlign: "center",
+  },
   card: {
-    margin: 4,
+    margin: 10,
+    backgroundColor: "gray",
   },
   content: {
     flexDirection: "row",
     justifyContent: "space-between",
   },
+  checkbox: {
+    flexDirection: "row",
+    alignSelf: "center",
+    alignContent: "center",
+    justifyContent: "space-between",
+  },
 });
 
 export default TodoListScreen;
-
-// import {
-//   View,
-//   Text,
-//   StyleSheet,
-//   ScrollView,
-//   TouchableOpacity,
-// } from "react-native";
-// import React, { useEffect, useState } from "react";
-// import AsyncStorage from "@react-native-async-storage/async-storage";
-// import userService from "../../api/services/user.service";
-// import { Card, CheckBox } from "react-native-elements";
-// import { AntDesign } from "@expo/vector-icons";
-// import CustomLogo from "../../components/CustomLogo";
-
-// const TodoListScreen = ({ navigation }: any) => {
-//   const [completed, setCompleted] = useState<boolean>(false);
-//   const [token, setToken] = useState<string | any>("");
-//   const [todos, setTodos] = useState<any>([]);
-
-//   const config = {
-//     headers: {
-//       Authorization: `Bearer ${token}`,
-//     },
-//   };
-
-//   const getToken = async () => {
-//     const tokens = await AsyncStorage.getItem("access_token");
-//     setToken(tokens);
-//   };
-//   useEffect(() => {
-//     getToken();
-//   }, []);
-
-//   const getData = async () => {
-//     const data = await userService.getTodo(config);
-
-//     setTodos(data.data);
-//   };
-
-//   useEffect(() => {
-//     if (token) {
-//       getData();
-//     }
-//   }, [token]);
-
-//   const delData = async (id: any) => {
-//     await userService.delTodo(id, config);
-//   };
-
-//   const onTodoList = () => {
-//     navigation.navigate("TodoScreen");
-//   };
-
-//   return (
-//     <ScrollView>
-//       <View style={styles.container}>
-//         <View style={styles.logo}>
-//           <CustomLogo />
-//         </View>
-//         <TouchableOpacity onPress={onTodoList} style={{ alignItems: "center" }}>
-//           <Text style={{ color: "red" }}>Créer une nouvelle tâche</Text>
-//         </TouchableOpacity>
-//         {todos.map((item: any, key: any) => (
-//           <Card key={key}>
-//             <Text
-//               style={{
-//                 fontWeight: "bold",
-//                 textAlign: "center",
-//                 color: "black",
-//               }}
-//             >
-//               Titre :{item.title}
-//             </Text>
-//             <Text style={{ color: "gray", textAlign: "center" }}>
-//               Description :{item.description}
-//             </Text>
-//             <View style={{ flexDirection: "row", alignItems: "center" }}>
-//               <View>
-//                 <CheckBox
-//                   style={{ alignSelf: "center", backgroundColor: "#202125" }}
-//                   center
-//                   checked={completed}
-//                   title="Completed"
-//                   onPress={() => setCompleted(!completed)}
-//                 />
-//               </View>
-//               <AntDesign
-//                 name="delete"
-//                 size={20}
-//                 color="red"
-//                 onPress={() => delData(item.id)}
-//               />
-//             </View>
-//           </Card>
-//         ))}
-//       </View>
-//     </ScrollView>
-//   );
-// };
-
-// export default TodoListScreen;
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     alignItems: "center",
-//     justifyContent: "center",
-//     backgroundColor: "black",
-//   },
-//   logo: {
-//     top: "3%",
-//     width: "50%",
-//     maxWidth: 300,
-//     maxHeight: 200,
-//     borderRadius: 70,
-//     marginBottom: 40,
-//   },
-// });

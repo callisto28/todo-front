@@ -7,6 +7,7 @@ interface Props {
   type?: string;
   onChangeText: (text: string) => void;
   setValue: (value: string) => void;
+  onFocus: () => void;
   label: string;
 
   secureTextEntry?: boolean;
@@ -26,6 +27,9 @@ const CustomInput = ({ value, type, label, setValue }: Props) => {
           },
         }}
         label={label}
+        onFocus={() => {
+          setValue(value);
+        }}
         mode="outlined"
         secureTextEntry={type === "password"}
         value={value}

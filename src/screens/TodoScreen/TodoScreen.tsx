@@ -4,47 +4,39 @@ import React, { useEffect, useState } from "react";
 import CustomInput from "../../components/CustomInput";
 import CustomButton from "../../components/CustomButton";
 import CustomLogo from "../../components/CustomLogo";
-import userService from "../../api/services/user.service";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { usePostTodoMutation } from "../../api/services/todo.service";
+import { useDispatch } from "react-redux";
+import { addTodo, setTodo } from "../../api/store/reducers/todo.reducer";
+import store from "../../api/store/Store";
 
 const TodoScreen = ({ navigation }: any) => {
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [completed, setCompleted] = useState<boolean>(false);
-  const [token, setToken] = useState<any>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const getToken = async () => {
-    const token = await AsyncStorage.getItem("access_token");
-    setToken(token);
+  const [postTodo, { isLoading, data, isSuccess }] = usePostTodoMutation();
+  console.log(isSuccess, "isSuccess addtodo");
+
+  const dispatch = useDispatch();
+
+  const onSignInPress = (todoService: {
+    id: number;
+    title: string;
+    description: string;
+    completed: boolean;
+  }) => {
+    dispatch(
+      addTodo({
+        id: todoService.id,
+        title: todoService.title,
+        description: todoService.description,
+        completed: todoService.completed,
+      })
+    );
+    postTodo({ title, description, completed });
+    navigation.navigate("TodoListScreen");
   };
 
-  useEffect(() => {
-    getToken();
-  }, []);
-
-  const onSignInPress = async () => {
-    if (!title.trim() || !description.trim()) {
-      alert("Please enter title and description");
-      return;
-    }
-    setIsLoading(true);
-
-    const config = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
-
-    const params = { title, description, completed, config };
-    try {
-      await userService.postTodo(params);
-      navigation.navigate("TodoListScreen");
-    } catch (error) {
-      alert("Invalid title or description");
-      setIsLoading(false);
-    }
-  };
   const onTodoList = () => {
     navigation.navigate("TodoListScreen");
   };
@@ -67,6 +59,9 @@ const TodoScreen = ({ navigation }: any) => {
           value={title}
           secureTextEntry={false}
           type="text"
+          onFocus={() => {
+            setTitle("");
+          }}
           setValue={setTitle}
           onChangeText={(value) => setTitle(value)}
         />
@@ -76,6 +71,9 @@ const TodoScreen = ({ navigation }: any) => {
           value={description}
           secureTextEntry={false}
           type="text"
+          onFocus={() => {
+            setDescription("");
+          }}
           setValue={setDescription}
           onChangeText={(value) => setDescription(value)}
         />
@@ -87,7 +85,7 @@ const TodoScreen = ({ navigation }: any) => {
           onPress={() => setCompleted(!completed)}
         />
       </View>
-      <View>
+      <View style={styles.button}>
         <CustomButton text="Valider votre tâche" onPress={onSignInPress} />
         <CustomButton text="Voir vos Tâches" onPress={onTodoList} />
       </View>
@@ -100,8 +98,8 @@ export default TodoScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignSelf: "stretch",
-    justifyContent: "space-around",
+    alignItems: "center",
+    justifyContent: "center",
     backgroundColor: "black",
   },
   checkbox: {
@@ -109,10 +107,17 @@ const styles = StyleSheet.create({
     backgroundColor: "#202125",
   },
   logo: {
-    maxWidth: 250,
-    maxHeight: 150,
-    marginHorizontal: "25%",
-    borderRadius: 50,
+    width: "50%",
+    maxWidth: 300,
+    maxHeight: 200,
+    borderRadius: 70,
     marginBottom: 40,
   },
+  button: {
+    width: "55%",
+    borderRadius: 70,
+  },
 });
+function logout(arg0: null): any {
+  throw new Error("Function not implemented.");
+}
