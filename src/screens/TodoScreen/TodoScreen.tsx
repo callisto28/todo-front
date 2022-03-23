@@ -6,8 +6,9 @@ import CustomButton from "../../components/CustomButton";
 import CustomLogo from "../../components/CustomLogo";
 import { usePostTodoMutation } from "../../api/services/todo.service";
 import { useDispatch } from "react-redux";
-import { addTodo, setTodo } from "../../api/store/reducers/todo.reducer";
+
 import store from "../../api/store/Store";
+import { addTodo } from "../../api/store/reducers/todo.reducer";
 
 const TodoScreen = ({ navigation }: any) => {
   const [title, setTitle] = useState<string>("");
@@ -77,13 +78,6 @@ const TodoScreen = ({ navigation }: any) => {
           setValue={setDescription}
           onChangeText={(value) => setDescription(value)}
         />
-        <CheckBox
-          style={styles.checkbox}
-          center
-          title="Completed"
-          checked={completed}
-          onPress={() => setCompleted(!completed)}
-        />
       </View>
       <View style={styles.button}>
         <CustomButton text="Valider votre tâche" onPress={onSignInPress} />
@@ -118,6 +112,3 @@ const styles = StyleSheet.create({
     borderRadius: 70,
   },
 });
-function logout(arg0: null): any {
-  throw new Error("Function not implemented.");
-}

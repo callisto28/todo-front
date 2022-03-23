@@ -47,9 +47,16 @@ const TodoListScreen = ({ navigation }: any) => {
               <Text style={styles.text}>{todo.title.toUpperCase()}</Text>
               <Text style={styles.text}>{todo.description}</Text>
               <View style={styles.checkbox}>
-                <CheckBox
+                {/* <CheckBox
                   title="Completed"
                   checked={todo.completed}
+                  onPress={() => setCompleted(!todo.completed)}
+                /> */}
+                <CheckBox
+                  style={styles.checkbox}
+                  center
+                  title="Completed"
+                  checked={completed}
                   onPress={() => setCompleted(!todo.completed)}
                 />
 

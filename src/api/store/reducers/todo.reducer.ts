@@ -45,23 +45,20 @@ const slice = createSlice({
         },
         // type: "sliceName/addTodo"
         addTodo(state: TodoState, { payload: todo }: PayloadAction<TodoState>) {
-            const newTodo = {
-                id: state.id + 1,
-                title: todo.title,
-                description: todo.description,
-                completed: todo.completed,
-            };
-            state.id = newTodo.id;
-        },
-        // type: "sliceName/removeTodo"
-        removeTodo(state: TodoState, { payload: todo }: PayloadAction<TodoState>) {
             state.id = todo.id;
+            state.title = todo.title;
+            state.description = todo.description;
+            state.completed = todo.completed;
         },
-        // type: "sliceName/toggleTodo"
-        toggleTodo(state: TodoState, { payload: todo }: PayloadAction<TodoState>) {
+        // // type: "sliceName/removeTodo"
+        // removeTodo(state: TodoState, { payload: todo }: PayloadAction<TodoState>) {
+        //     state.id = todo.id;
+        // },
+        // // type: "sliceName/toggleTodo"
+        // toggleTodo(state: TodoState, { payload: todo }: PayloadAction<TodoState>) {
 
-            state.id = todo.id;
-        }
+        //     state.id = todo.id;
+        // }
     },
 });
 
@@ -73,6 +70,9 @@ const selectSlice = (state: LocalRootState) => state[sliceName];
 
 export const selecTodo = (state: LocalRootState): TodoState => selectSlice(state);
 
-export const { setTodo, addTodo, removeTodo } = slice.actions;
+export const { setTodo,
+    addTodo,
+    //   removeTodo
+} = slice.actions;
 
 export default makeRoot(slice.reducer);

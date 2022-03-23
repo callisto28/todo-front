@@ -25,14 +25,14 @@ const rootReducer = combineReducers({
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 const store = configureStore({
-  reducer: rootReducer,
+  reducer: {
+    [todoService.reducerPath]: todoService.reducer,
+    user: userReducer[userSliceName]
+  },
   // reducer: persistedReducer,
   middleware: (getDefaultMiddleware) => {
-    getDefaultMiddleware().concat(todoService.middleware);
+    return getDefaultMiddleware({ serializableCheck: false }).concat(todoService.middleware);
 
-    return getDefaultMiddleware({
-      serializableCheck: false,
-    });
   },
 });
 

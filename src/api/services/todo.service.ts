@@ -60,22 +60,24 @@ export const todoService = createApi({
                 url: `todo/create`,
                 method: 'POST',
                 body,
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                invalidatesTags: ['todo'],
+                // headers: {
+                //     "Content-Type": "application/json",
+                // },
+
             }),
+            invalidatesTags: ['todo'],
         }),
 
         delTodo: build.mutation({
             query: (id: number) => ({
                 url: `todo/${id}`,
                 method: 'DELETE',
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                invalidatesTags: ['todo'],
+                // headers: {
+                //     "Content-Type": "application/json",
+                // },
+
             }),
+            invalidatesTags: ['todo'],
         }),
     }),
 
