@@ -10,6 +10,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { usePostLoginMutation } from "../../../api/services/todo.service";
 import { useDispatch } from "react-redux";
 import { setUser } from "../../../api/store/reducers/user.reducer";
+import TextInputCust from "../../../components/TextInputCust";
+import ControlledInput from "../../../components/TextInputCust";
 
 type FormValues = {
   username: string;
@@ -21,18 +23,18 @@ const Login = ({ navigation }: any) => {
   const [password, setPassword] = useState<string>("");
 
   const [postLogin, { isLoading, data, isSuccess }] = usePostLoginMutation();
-  console.log(isSuccess, "isSuccess");
 
   const dispatch = useDispatch();
 
   const onSubmit = (user: {
     username: string;
     password: string;
-    access_token: string;
+    access_token?: string;
   }) => {
     postLogin({ username, password });
 
-    navigation.navigate("TodoListScreen" as any);
+    navigation.navigate("TodoListScreen");
+    clearErrors();
   };
 
   useEffect(() => {
@@ -46,13 +48,13 @@ const Login = ({ navigation }: any) => {
   }, [data]);
 
   const validationSchema = Yup.object({
-    username: Yup.string().required("Username is required"),
+    username: Yup.string().required("Veuillez saisir votre nom d'utilisateur"),
     password: Yup.string()
-      .min(8, "Veuillez saisir au moins 8 caractères")
-      .matches(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/,
-        "Must Contain 8 Characters, One Uppercase, One Lowercase, One Number and One Special Case Character"
-      )
+      // .min(8, "Veuillez saisir au moins 8 caractères")
+      // .matches(
+      //   /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/,
+      //   "Must Contain 8 Characters, One Uppercase, One Lowercase, One Number and One Special Case Character"
+      // )
       .required("Password is required"),
   }).required();
 
@@ -62,7 +64,6 @@ const Login = ({ navigation }: any) => {
     clearErrors,
     formState: { errors },
   } = useForm<FormValues>({
-    mode: "onBlur",
     resolver: yupResolver(validationSchema),
   });
 
@@ -79,46 +80,49 @@ const Login = ({ navigation }: any) => {
           alignSelf: "center",
         }}
       >
-        {/* <Controller
+        <Controller
           control={control}
           name="username"
-          render={({ field: { onChange, value }, fieldState: { error } }) => ( */}
-        <CustomInput
-          label="Username"
-          value={username}
-          secureTextEntry={false}
-          type="text"
-          onFocus={() => {
-            setUsername("");
-          }}
-          setValue={setUsername}
-          onChangeText={(value) => setUsername(value)}
+          render={({
+            field: { onChange, value, onBlur },
+            fieldState: { error },
+          }) => (
+            <CustomInput
+              label="Username"
+              value={username}
+              secureTextEntry={false}
+              type="text"
+              onBlur={onBlur}
+              setValue={setUsername}
+              onChangeText={onChange}
+              error={error?.message}
+            />
+          )}
         />
-        {/* )}
-        /> */}
-        {/* <Controller
+        <Controller
           control={control}
           name="password"
-          render={({ field: { onChange, value }, fieldState: { error } }) => ( */}
-        <CustomInput
-          value={password}
-          label="password"
-          type="password"
-          onFocus={() => {
-            setPassword("");
-          }}
-          secureTextEntry={true}
-          setValue={setPassword}
-          onChangeText={(value) => setPassword(value)}
+          render={({
+            field: { onChange, value, onBlur },
+            fieldState: { error },
+          }) => (
+            <CustomInput
+              value={password}
+              label="password"
+              type="password"
+              onBlur={onBlur}
+              secureTextEntry={true}
+              setValue={setPassword}
+              onChangeText={onChange}
+              error={error?.message}
+            />
+          )}
         />
-        {/* )}
-        /> */}
         {errors && (
           <Text style={styles.error}>Veuillez remplir tous les champs</Text>
         )}
         <View>
           <CustomButton text="Login" onPress={onSubmit} />
-          {/* navigation.navigate("TodoScreen" as any); */}
         </View>
         <View
           style={{
@@ -147,7 +151,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignSelf: "stretch",
     justifyContent: "space-around",
-    backgroundColor: "black",
+    backgroundColor: "#000",
   },
   logo: {
     maxWidth: 250,
@@ -162,7 +166,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   error: {
-    color: "red",
+    color: "#f00",
+    textAlign: "center",
     fontWeight: "500",
     marginBottom: 5,
   },

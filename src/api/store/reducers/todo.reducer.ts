@@ -70,7 +70,8 @@ const selectSlice = (state: LocalRootState) => state[sliceName];
 
 export const selecTodo = (state: LocalRootState): TodoState => selectSlice(state);
 
-export const { setTodo,
+export const {
+    setTodo,
     addTodo,
     //   removeTodo
 } = slice.actions;

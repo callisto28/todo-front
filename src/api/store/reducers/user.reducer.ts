@@ -54,7 +54,7 @@ const selectSlice = (state: LocalRootState) => state[sliceName];
 
 export const selectUser = (state: LocalRootState): {} => selectSlice(state);
 
-export const { setUser } = slice.actions;
+export const { setUser, logout } = slice.actions;
 
 
 

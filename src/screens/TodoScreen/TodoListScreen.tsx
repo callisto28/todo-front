@@ -21,14 +21,12 @@ const TodoListScreen = ({ navigation }: any) => {
   const [delTodo, { isLoading: isDeleting }] = useDelTodoMutation();
   const { isLoading, error, data } = useGetTodoQuery("");
 
-  console.log(isDeleting, "isDeleting");
-
   const dispatch = useDispatch();
+
   const DelData = (id: number) => {
-    console.log(id);
     delTodo(id);
   };
-  console.log(data, "data list");
+
   return (
     <ScrollView style={styles.container}>
       {error ? (
@@ -38,14 +36,27 @@ const TodoListScreen = ({ navigation }: any) => {
       ) : data ? (
         <View style={styles.container}>
           <TouchableOpacity onPress={() => navigation.navigate("TodoScreen")}>
-            <Text style={{ color: "white", textAlign: "center" }}>
+            <Text
+              style={{
+                color: "#000",
+                alignSelf: "center",
+                textAlign: "center",
+                paddingHorizontal: 5,
+                borderColor: "#000",
+                backgroundColor: "#3ADCFE",
+                borderWidth: 1,
+                borderRadius: 5,
+                width: "50%",
+              }}
+            >
               Créer une nouvelle tâche
             </Text>
           </TouchableOpacity>
           {data?.map((todo: any, index: any) => (
-            <View key={index} style={styles.container}>
+            <View key={index} style={styles.content}>
               <Text style={styles.text}>{todo.title.toUpperCase()}</Text>
               <Text style={styles.text}>{todo.description}</Text>
+
               <View style={styles.checkbox}>
                 {/* <CheckBox
                   title="Completed"
@@ -53,11 +64,16 @@ const TodoListScreen = ({ navigation }: any) => {
                   onPress={() => setCompleted(!todo.completed)}
                 /> */}
                 <CheckBox
-                  style={styles.checkbox}
+                  // style={styles.checkbox}
                   center
                   title="Completed"
-                  checked={completed}
-                  onPress={() => setCompleted(!todo.completed)}
+                  checked={completed[todo.id]}
+                  onPress={(newValue: any) => {
+                    setCompleted({
+                      ...completed,
+                      [todo.id]: newValue ? true : false,
+                    });
+                  }}
                 />
 
                 <AntDesign
@@ -91,14 +107,23 @@ const styles = StyleSheet.create({
     backgroundColor: "gray",
   },
   content: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
+    alignItems: "center",
+    alignSelf: "center",
+    marginTop: 20,
+    borderColor: "#fff",
+    borderWidth: 1,
+    borderRadius: 5,
+    padding: 10,
+    backgroundColor: "#000",
+    width: "70%",
   },
   checkbox: {
     flexDirection: "row",
+    alignItems: "center",
     alignSelf: "center",
-    alignContent: "center",
-    justifyContent: "space-between",
+    alignContent: "space-around",
+    justifyContent: "space-around",
   },
 });
 

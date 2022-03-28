@@ -6,9 +6,12 @@ import CustomButton from "../../components/CustomButton";
 import CustomLogo from "../../components/CustomLogo";
 import { usePostTodoMutation } from "../../api/services/todo.service";
 import { useDispatch } from "react-redux";
-
 import store from "../../api/store/Store";
 import { addTodo } from "../../api/store/reducers/todo.reducer";
+import { logout } from "../../api/store/reducers/user.reducer";
+import { Entypo } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 
 const TodoScreen = ({ navigation }: any) => {
   const [title, setTitle] = useState<string>("");
@@ -16,9 +19,13 @@ const TodoScreen = ({ navigation }: any) => {
   const [completed, setCompleted] = useState<boolean>(false);
 
   const [postTodo, { isLoading, data, isSuccess }] = usePostTodoMutation();
-  console.log(isSuccess, "isSuccess addtodo");
 
   const dispatch = useDispatch();
+
+  const onLogout = () => {
+    store.dispatch(logout(null));
+    navigation.navigate("Accueil Todo");
+  };
 
   const onSignInPress = (todoService: {
     id: number;
@@ -80,8 +87,15 @@ const TodoScreen = ({ navigation }: any) => {
         />
       </View>
       <View style={styles.button}>
-        <CustomButton text="Valider votre tâche" onPress={onSignInPress} />
-        <CustomButton text="Voir vos Tâches" onPress={onTodoList} />
+        <AntDesign name="home" size={30} color="green" onPress={onLogout} />
+
+        <Ionicons
+          name="create"
+          size={30}
+          color="blue"
+          onPress={onSignInPress}
+        />
+        <Entypo name="list" size={30} color="red" onPress={onTodoList} />
       </View>
     </View>
   );
@@ -108,7 +122,9 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   button: {
-    width: "55%",
-    borderRadius: 70,
+    flexDirection: "row",
+    justifyContent: "space-around",
+    width: "100%",
+    marginBottom: 20,
   },
 });

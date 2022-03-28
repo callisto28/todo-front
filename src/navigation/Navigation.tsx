@@ -7,7 +7,6 @@ import TodoScreen from "../screens/TodoScreen/TodoScreen";
 import TodoListScreen from "../screens/TodoScreen/TodoListScreen";
 import { useSelector } from "react-redux";
 import { LocalRootState } from "../api/store/reducers/user.reducer";
-import { Button } from "react-native-paper";
 
 const Stack = createNativeStackNavigator();
 

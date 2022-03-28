@@ -1,39 +1,54 @@
-import { TextInput as PaperInput } from "react-native-paper";
+import { TextInput as PaperInput, useTheme } from "react-native-paper";
 import { View, Text, StyleSheet } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 
 interface Props {
   value: string;
   type?: string;
   onChangeText: (text: string) => void;
   setValue: (value: string) => void;
-  onFocus: () => void;
+  onFocus?: () => void;
   label: string;
-
+  onBlur?: () => void;
+  error?: boolean | string;
   secureTextEntry?: boolean;
 }
 
-const CustomInput = ({ value, type, label, setValue }: Props) => {
+const CustomInput = ({ value, type, label, setValue, onBlur }: Props) => {
+  const [hidden, setHidden] = useState(true);
+  const { colors } = useTheme();
+
   return (
-    <View style={styles.inputView}>
+    <View>
       <PaperInput
+        autoComplete={"off"}
         theme={{
+          roundness: 15,
           colors: {
-            primary: "#3B71F3",
-            placeholder: "white",
-            background: "#2E2E2E",
+            primary: "#3ADCFE",
+            placeholder: "#fff",
+            background: "#000",
             text: "#fff",
-            surface: "#2E2E2E",
+            surface: "blue",
           },
         }}
         label={label}
-        onFocus={() => {
-          setValue(value);
-        }}
+        onBlur={onBlur}
         mode="outlined"
         secureTextEntry={type === "password"}
         value={value}
         onChangeText={(text) => setValue(text)}
+        right={
+          type === "password" && (
+            <PaperInput.Icon
+              icon={hidden ? "eye" : "eye-off"}
+              size={25}
+              style={styles.icon}
+              color={colors.primary}
+              onPress={() => setHidden(!hidden)}
+            />
+          )
+        }
       />
     </View>
   );
@@ -42,12 +57,13 @@ const CustomInput = ({ value, type, label, setValue }: Props) => {
 export default CustomInput;
 
 const styles = StyleSheet.create({
-  inputView: {
-    paddingBottom: 8,
-  },
-  error: {
-    color: "red",
-    fontWeight: "500",
-    marginBottom: 5,
-  },
+  // inputView: {
+  //   borderRadius: 15,
+  //   borderWidth: 3,
+  // },
+  // error: {
+  //   color: "red",
+  //   fontWeight: "500",
+  //   marginBottom: 5,
+  // },
 });
