@@ -8,6 +8,17 @@ import { DefaultTheme, Provider as PaperProvider } from "react-native-paper";
 import { Provider as StoreProvider } from "react-redux";
 import store, { persistor } from "./src/api/store/Store";
 import { PersistGate } from "redux-persist/integration/react";
+import { LogBox } from "react-native";
+import _ from "lodash";
+
+LogBox.ignoreLogs(["Unhandled promise rejection:..."]); // ignore specific logs
+LogBox.ignoreAllLogs(); // ignore all logs
+const _console = _.clone(console);
+console.warn = (message) => {
+  if (message.indexOf("Remote debugger is in a background") <= -1) {
+    _console.warn(message);
+  }
+};
 
 const DefaultThemes = {
   ...DefaultTheme,

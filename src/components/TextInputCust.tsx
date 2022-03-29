@@ -4,7 +4,7 @@ import { Controller } from "react-hook-form";
 import { View, StyleSheet } from "react-native";
 import { HelperText, TextInput, useTheme } from "react-native-paper";
 
-const ControlledInput = ({ control, rules, name, type, ...props }) => {
+const ControlledInput = ({ control, rules, name, type, ...props }: any) => {
   const [hidden, setHidden] = useState(true);
   const { colors } = useTheme();
   return (

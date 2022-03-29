@@ -8,7 +8,7 @@ import CustomTextInput from "../../../components/CustomTextInput";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { usePostLoginMutation } from "../../../api/services/todo.service";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "../../../api/store/reducers/user.reducer";
 import TextInputCust from "../../../components/TextInputCust";
 import ControlledInput from "../../../components/TextInputCust";
@@ -26,6 +26,14 @@ const Login = ({ navigation }: any) => {
 
   const dispatch = useDispatch();
 
+  const isToken = useSelector((state) => state.user.access_token);
+
+  useEffect(() => {
+    if (isToken) {
+      navigation.navigate("TodoListScreen");
+    }
+  }, [isToken]);
+
   const onSubmit = (user: {
     username: string;
     password: string;
@@ -33,7 +41,7 @@ const Login = ({ navigation }: any) => {
   }) => {
     postLogin({ username, password });
 
-    navigation.navigate("TodoListScreen");
+    // navigation.navigate("TodoListScreen");
     clearErrors();
   };
 
@@ -41,7 +49,7 @@ const Login = ({ navigation }: any) => {
     if (data?.access_token) {
       dispatch(
         setUser({
-          access_token: data.access_token,
+          access_token: data?.access_token,
         })
       );
     }

@@ -5,7 +5,7 @@ import CustomInput from "../../components/CustomInput";
 import CustomButton from "../../components/CustomButton";
 import CustomLogo from "../../components/CustomLogo";
 import { usePostTodoMutation } from "../../api/services/todo.service";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import store from "../../api/store/Store";
 import { addTodo } from "../../api/store/reducers/todo.reducer";
 import { logout } from "../../api/store/reducers/user.reducer";
@@ -22,12 +22,14 @@ const TodoScreen = ({ navigation }: any) => {
 
   const dispatch = useDispatch();
 
+  const logOut = useSelector((state) => state.user.access_token);
+
   const onLogout = () => {
     store.dispatch(logout(null));
     navigation.navigate("Accueil Todo");
   };
 
-  const onSignInPress = (todoService: {
+  const onSignInPress = async (todoService: {
     id: number;
     title: string;
     description: string;
@@ -41,7 +43,7 @@ const TodoScreen = ({ navigation }: any) => {
         completed: todoService.completed,
       })
     );
-    postTodo({ title, description, completed });
+    await postTodo({ title, description, completed });
     navigation.navigate("TodoListScreen");
   };
 
