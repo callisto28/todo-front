@@ -1,5 +1,5 @@
 import { TextInput as PaperInput, useTheme } from "react-native-paper";
-import { View, Text, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import React, { useState } from "react";
 
 interface Props {

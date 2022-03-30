@@ -1,17 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import CustomButton from "../../../components/CustomButton";
-import CustomInput from "../../../components/CustomInput";
 import CustomLogo from "../../../components/CustomLogo";
 import CustomTextInput from "../../../components/CustomTextInput";
 import * as Yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
 import { usePostLoginMutation } from "../../../api/services/todo.service";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "../../../api/store/reducers/user.reducer";
 import TextInputCust from "../../../components/TextInputCust";
-import ControlledInput from "../../../components/TextInputCust";
 
 type FormValues = {
   username: string;
@@ -21,27 +18,18 @@ type FormValues = {
 const Login = ({ navigation }: any) => {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-
   const [postLogin, { isLoading, data, isSuccess }] = usePostLoginMutation();
-
   const dispatch = useDispatch();
-
   const isToken = useSelector((state) => state.user.access_token);
-
   useEffect(() => {
     if (isToken) {
       navigation.navigate("TodoListScreen");
     }
   }, [isToken]);
 
-  const onSubmit = (user: {
-    username: string;
-    password: string;
-    access_token?: string;
-  }) => {
+  const onSubmit = (data: any) => {
+    const { username, password } = data;
     postLogin({ username, password });
-
-    // navigation.navigate("TodoListScreen");
     clearErrors();
   };
 
@@ -55,25 +43,12 @@ const Login = ({ navigation }: any) => {
     }
   }, [data]);
 
-  const validationSchema = Yup.object({
-    username: Yup.string().required("Veuillez saisir votre nom d'utilisateur"),
-    password: Yup.string()
-      // .min(8, "Veuillez saisir au moins 8 caractères")
-      // .matches(
-      //   /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/,
-      //   "Must Contain 8 Characters, One Uppercase, One Lowercase, One Number and One Special Case Character"
-      // )
-      .required("Password is required"),
-  }).required();
-
   const {
     control,
     handleSubmit,
     clearErrors,
     formState: { errors },
-  } = useForm<FormValues>({
-    resolver: yupResolver(validationSchema),
-  });
+  } = useForm<FormValues>();
 
   return (
     <View style={styles.container}>
@@ -88,49 +63,39 @@ const Login = ({ navigation }: any) => {
           alignSelf: "center",
         }}
       >
-        <Controller
+        <TextInputCust
           control={control}
+          placeholder="username"
           name="username"
-          render={({
-            field: { onChange, value, onBlur },
-            fieldState: { error },
-          }) => (
-            <CustomInput
-              label="Username"
-              value={username}
-              secureTextEntry={false}
-              type="text"
-              onBlur={onBlur}
-              setValue={setUsername}
-              onChangeText={onChange}
-              error={error?.message}
-            />
-          )}
+          type="username"
+          rules={{
+            required: "Champs requis",
+          }}
+          defaultValue=""
+          error={errors.password}
         />
-        <Controller
+
+        <TextInputCust
           control={control}
+          placeholder="Mot De Passe"
           name="password"
-          render={({
-            field: { onChange, value, onBlur },
-            fieldState: { error },
-          }) => (
-            <CustomInput
-              value={password}
-              label="password"
-              type="password"
-              onBlur={onBlur}
-              secureTextEntry={true}
-              setValue={setPassword}
-              onChangeText={onChange}
-              error={error?.message}
-            />
-          )}
+          type="password"
+          //  rules={{
+          //    required: 'Champs requis',
+          //    pattern: {
+          //      value: pass,
+          //      message: 'Doit avoir 8 caractères, une majuscule, une minuscule et un chiffre',
+          //    },
+          //  }}
+          defaultValue=""
+          error={errors.password}
         />
-        {errors && (
+
+        {errors.username && errors.password && (
           <Text style={styles.error}>Veuillez remplir tous les champs</Text>
         )}
         <View>
-          <CustomButton text="Login" onPress={onSubmit} />
+          <CustomButton text="Login" onPress={handleSubmit(onSubmit)} />
         </View>
         <View
           style={{

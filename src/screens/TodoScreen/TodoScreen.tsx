@@ -1,11 +1,9 @@
 import { View, StyleSheet } from "react-native";
-import { CheckBox } from "react-native-elements";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import CustomInput from "../../components/CustomInput";
-import CustomButton from "../../components/CustomButton";
 import CustomLogo from "../../components/CustomLogo";
 import { usePostTodoMutation } from "../../api/services/todo.service";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import store from "../../api/store/Store";
 import { addTodo } from "../../api/store/reducers/todo.reducer";
 import { logout } from "../../api/store/reducers/user.reducer";
@@ -22,11 +20,8 @@ const TodoScreen = ({ navigation }: any) => {
 
   const dispatch = useDispatch();
 
-  const logOut = useSelector((state) => state.user.access_token);
-
   const onLogout = () => {
     store.dispatch(logout(null));
-    navigation.navigate("Accueil Todo");
   };
 
   const onSignInPress = async (todoService: {

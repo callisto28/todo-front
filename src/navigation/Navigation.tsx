@@ -7,6 +7,7 @@ import TodoScreen from "../screens/TodoScreen/TodoScreen";
 import TodoListScreen from "../screens/TodoScreen/TodoListScreen";
 import { useSelector } from "react-redux";
 import { LocalRootState } from "../api/store/reducers/user.reducer";
+import { AntDesign } from "@expo/vector-icons";
 
 const Stack = createNativeStackNavigator();
 
@@ -29,6 +30,7 @@ export const Navigation = () => {
               headerStyle: {
                 backgroundColor: "black",
               },
+              headerShadowVisible: false,
             }}
           />
           <Stack.Screen
@@ -57,17 +59,20 @@ export const Navigation = () => {
           />
         </Stack.Group>
       ) : (
-        <Stack.Group>
+        <Stack.Group
+          screenOptions={{
+            headerTitleAlign: "center",
+            headerTintColor: "white",
+            headerStyle: {
+              backgroundColor: "black",
+            },
+          }}
+        >
           <Stack.Screen
             name="TodoScreen"
             component={TodoScreen}
             options={{
               title: "Ajouter une tâche",
-              headerTitleAlign: "center",
-              headerTintColor: "white",
-              headerStyle: {
-                backgroundColor: "black",
-              },
             }}
           />
           <Stack.Screen
@@ -75,11 +80,6 @@ export const Navigation = () => {
             component={TodoListScreen}
             options={{
               title: "Liste de mes tâches",
-              headerTitleAlign: "center",
-              headerTintColor: "white",
-              headerStyle: {
-                backgroundColor: "black",
-              },
             }}
           />
         </Stack.Group>

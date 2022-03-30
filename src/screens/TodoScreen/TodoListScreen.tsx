@@ -4,29 +4,38 @@ import {
   StyleSheet,
   ActivityIndicator,
   ScrollView,
-  SafeAreaView,
   TouchableOpacity,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   useDelTodoMutation,
   useGetTodoQuery,
 } from "../../api/services/todo.service";
 import { Checkbox } from "react-native-paper";
-
 import { AntDesign } from "@expo/vector-icons";
-import { useDispatch, useSelector } from "react-redux";
 
 const TodoListScreen = ({ navigation }: any) => {
-  const [completed, setCompleted] = useState<boolean>(false);
-  const [delTodo, { isLoading: isDeleting }] = useDelTodoMutation();
   const { isLoading, error, data } = useGetTodoQuery("");
-
-  const dispatch = useDispatch();
+  const [delTodo, { isLoading: isDeleting }] = useDelTodoMutation();
 
   const DelData = (id: number) => {
     delTodo(id);
   };
+  const [completed, setCompleted] = useState({});
+  console.log(completed, "completed");
+
+  const handleCheck = (id: number) => {
+    setCompleted({ ...completed, [id]: !completed[id] });
+  };
+
+  useEffect(() => {
+    const init = {};
+    data &&
+      data.map((item: { id: number; completed: boolean }) => {
+        init[item.id] = item.completed;
+      });
+    setCompleted(init);
+  }, []);
 
   return (
     <ScrollView style={styles.container}>
@@ -53,43 +62,18 @@ const TodoListScreen = ({ navigation }: any) => {
               Créer une nouvelle tâche
             </Text>
           </TouchableOpacity>
-          {data?.map((todo: any, index: any) => (
+          {data?.map((todo: any | boolean, index: any) => (
             <View key={index} style={styles.content}>
               <Text style={styles.textTitre}>{todo.title.toUpperCase()}</Text>
               <Text style={styles.textContent}>{todo.description}</Text>
 
               <View style={styles.checkbox}>
                 <Checkbox
-                  status={completed[todo.id] ? "checked" : "unchecked"}
-                  onPress={() => {
-                    setCompleted({
-                      ...completed,
-                      [todo.id]: !completed[todo.id],
-                    });
-                  }}
                   color="#6BF10E"
                   uncheckedColor="#3ADCFE"
+                  status={completed[todo.id] ? "checked" : "unchecked"}
+                  onPress={() => handleCheck(todo.id)}
                 />
-
-                {/* <CheckBox
-                  title="Completed"
-                  checked={todo.completed}
-                  onPress={() => setCompleted(!todo.completed)}
-                /> */}
-                {/* <CheckBox
-                  // style={styles.checkbox}
-                  center
-                  title="Completed"
-                  checked={completed[todo.id]}
-                  onPress={() => setCompleted(!todo.id)}
-                  // checked={completed[todo.id]}
-                  // onPress={(newValue: any) => {
-                  //   setCompleted({
-                  //     ...completed,
-                  //     [todo.id]: newValue ? true : false,
-                  //   });
-                  // }}
-                /> */}
 
                 <AntDesign
                   name="delete"
@@ -137,7 +121,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     borderColor: "#3ADCFE",
     borderWidth: 1,
-    borderRadius: 5,
+    borderRadius: 15,
     padding: 10,
     backgroundColor: "#000",
     width: "70%",
