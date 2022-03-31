@@ -43,3 +43,12 @@ export type User = {
     password: string
 
 }
+
+export type Patch = {
+    id?: string,
+    title?: string,
+    description?: string,
+    completed?: boolean,
+    userId?: string
+
+}

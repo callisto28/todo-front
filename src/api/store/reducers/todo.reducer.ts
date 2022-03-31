@@ -54,11 +54,12 @@ const slice = createSlice({
         // removeTodo(state: TodoState, { payload: todo }: PayloadAction<TodoState>) {
         //     state.id = todo.id;
         // },
-        // // type: "sliceName/toggleTodo"
-        // toggleTodo(state: TodoState, { payload: todo }: PayloadAction<TodoState>) {
+        // type: "sliceName/toggleTodo"
+        patchTodo(state: TodoState, { payload: todo }: PayloadAction<TodoState>) {
+            state.id = todo.id;
+            state.completed = todo.completed;
 
-        //     state.id = todo.id;
-        // }
+        }
     },
 });
 
@@ -73,6 +74,7 @@ export const selecTodo = (state: LocalRootState): TodoState => selectSlice(state
 export const {
     setTodo,
     addTodo,
+    patchTodo,
     //   removeTodo
 } = slice.actions;
 

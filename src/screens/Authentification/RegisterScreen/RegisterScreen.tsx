@@ -17,6 +17,7 @@ import { RouteParams } from "../../../types/types";
 import { useDispatch } from "react-redux";
 import { setUser } from "../../../api/store/reducers/user.reducer";
 import { usePostSignupMutation } from "../../../api/services/todo.service";
+import TextInputCust from "../../../components/TextInputCust";
 
 export type SignupProps = NativeStackScreenProps<RouteParams, "Register">;
 
@@ -46,6 +47,7 @@ const Register = (props: SignupProps) => {
       })
     );
     await postSignup({ username, password, firstname, lastname });
+    clearErrors();
     navigation.navigate("Login" as any);
   };
 
@@ -66,10 +68,9 @@ const Register = (props: SignupProps) => {
   const {
     control,
     handleSubmit,
+    clearErrors,
     formState: { errors },
-  } = useForm<FormValues>({
-    resolver: yupResolver(validationSchema),
-  });
+  } = useForm<FormValues>();
 
   return (
     <View style={styles.container}>
@@ -85,39 +86,63 @@ const Register = (props: SignupProps) => {
         }}
       >
         <View>
-          <CustomInput
-            label="Pseudonyme"
-            value={username}
-            secureTextEntry={false}
-            type="text"
-            setValue={setUsername}
-            onChangeText={(value) => setUsername(value)}
+          <TextInputCust
+            control={control}
+            placeholder="username"
+            name="username"
+            type="username"
+            rules={{
+              required: "Champs requis",
+            }}
+            defaultValue=""
+            error={errors.username}
           />
 
-          <CustomInput
-            label="Mot de passe"
-            value={password}
+          <TextInputCust
+            control={control}
+            placeholder="Mot De Passe"
+            name="password"
             type="password"
-            secureTextEntry={true}
-            setValue={setPassword}
-            onChangeText={(value) => setPassword(value)}
+            //  rules={{
+            //    required: 'Champs requis',
+            //    pattern: {
+            //      value: pass,
+            //      message: 'Doit avoir 8 caractères, une majuscule, une minuscule et un chiffre',
+            //    },
+            //  }}
+            defaultValue=""
+            error={errors.password}
           />
 
-          <CustomInput
-            label="Prénom"
-            value={firstname}
-            secureTextEntry={false}
-            setValue={setFirstname}
-            onChangeText={(value) => setFirstname(value)}
+          <TextInputCust
+            control={control}
+            placeholder="prénom"
+            name="prénom"
+            type="prénom"
+            rules={{
+              required: "Champs requis",
+            }}
+            defaultValue=""
+            error={errors.firstname}
           />
 
-          <CustomInput
-            label="Nom"
-            value={lastname}
-            secureTextEntry={false}
-            setValue={setLastname}
-            onChangeText={(value) => setLastname(value)}
+          <TextInputCust
+            control={control}
+            placeholder="nom"
+            name="nom"
+            type="nom"
+            rules={{
+              required: "Champs requis",
+            }}
+            defaultValue=""
+            error={errors.lastname}
           />
+          {errors.username &&
+            errors.password &&
+            errors.lastname &&
+            errors.firstname && (
+              <Text style={styles.error}>Veuillez remplir tous les champs</Text>
+            )}
         </View>
         <View>
           <CustomButton
@@ -168,6 +193,12 @@ const styles = StyleSheet.create({
   link: {
     color: "blue",
     fontWeight: "bold",
+  },
+  error: {
+    color: "#f00",
+    textAlign: "center",
+    fontWeight: "500",
+    marginBottom: 5,
   },
 });
 

@@ -10,6 +10,7 @@ import React, { useEffect, useState } from "react";
 import {
   useDelTodoMutation,
   useGetTodoQuery,
+  usePatchTodoMutation,
 } from "../../api/services/todo.service";
 import { Checkbox } from "react-native-paper";
 import { AntDesign } from "@expo/vector-icons";
@@ -17,22 +18,28 @@ import { AntDesign } from "@expo/vector-icons";
 const TodoListScreen = ({ navigation }: any) => {
   const { isLoading, error, data } = useGetTodoQuery("");
   const [delTodo, { isLoading: isDeleting }] = useDelTodoMutation();
+  const [patchTodo] = usePatchTodoMutation();
 
-  const DelData = (id: number) => {
+  const DelData = (id: string) => {
     delTodo(id);
   };
   const [completed, setCompleted] = useState({});
   console.log(completed, "completed");
 
-  const handleCheck = (id: number) => {
-    setCompleted({ ...completed, [id]: !completed[id] });
+  const onSubmit = (id: string, userId: string, completed: boolean) => {
+    console.log(id, userId, completed, "data");
+    patchTodo({ id, completed, userId });
   };
 
   useEffect(() => {
-    const init = {};
+    let init = {};
     data &&
-      data.map((item: { id: number; completed: boolean }) => {
-        init[item.id] = item.completed;
+      data.map((item: { id: string; userId: string; completed: boolean }) => {
+        (init = item.id),
+          {
+            [item.id]: item.completed,
+          };
+        console.log(init, "init");
       });
     setCompleted(init);
   }, []);
@@ -71,8 +78,10 @@ const TodoListScreen = ({ navigation }: any) => {
                 <Checkbox
                   color="#6BF10E"
                   uncheckedColor="#3ADCFE"
-                  status={completed[todo.id] ? "checked" : "unchecked"}
-                  onPress={() => handleCheck(todo.id)}
+                  status={todo.completed ? "checked" : "unchecked"}
+                  onPress={() => {
+                    onSubmit(todo.id, todo.userId, !todo.completed);
+                  }}
                 />
 
                 <AntDesign

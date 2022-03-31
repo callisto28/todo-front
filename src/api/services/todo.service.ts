@@ -1,7 +1,8 @@
 import { createApi, fetchBaseQuery, } from '@reduxjs/toolkit/query/react';
-
 import { api_url } from '../config';
 import { RootState } from '../store/Store';
+
+
 
 
 export const todoService = createApi({
@@ -60,21 +61,25 @@ export const todoService = createApi({
                 url: `todo/create`,
                 method: 'POST',
                 body,
-                // headers: {
-                //     "Content-Type": "application/json",
-                // },
-
             }),
             invalidatesTags: ['todo'],
         }),
 
+
+        patchTodo: build.mutation({
+            query: (body: { id?: string, title?: string, description?: string, completed: boolean, userId: string }) => ({
+                url: `todo/${body.id}`,
+                method: 'PATCH',
+                body,
+            }),
+            invalidatesTags: ['todo'],
+        }),
+
+
         delTodo: build.mutation({
-            query: (id: number) => ({
+            query: (id: string) => ({
                 url: `todo/${id}`,
                 method: 'DELETE',
-                // headers: {
-                //     "Content-Type": "application/json",
-                // },
 
             }),
             invalidatesTags: ['todo'],
@@ -86,7 +91,7 @@ export const todoService = createApi({
 
 
 
-export const { usePostLoginMutation, usePostSignupMutation, usePostTodoMutation, useGetTodoQuery, useDelTodoMutation } = todoService;
+export const { usePostLoginMutation, usePostSignupMutation, usePostTodoMutation, useGetTodoQuery, useDelTodoMutation, usePatchTodoMutation, } = todoService;
 
 
 

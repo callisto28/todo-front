@@ -16,8 +16,6 @@ type FormValues = {
 };
 
 const Login = ({ navigation }: any) => {
-  const [username, setUsername] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
   const [postLogin, { isLoading, data, isSuccess }] = usePostLoginMutation();
   const dispatch = useDispatch();
   const isToken = useSelector((state) => state.user.access_token);
@@ -72,7 +70,7 @@ const Login = ({ navigation }: any) => {
             required: "Champs requis",
           }}
           defaultValue=""
-          error={errors.password}
+          error={errors.username}
         />
 
         <TextInputCust
